@@ -1,0 +1,9 @@
+.git
+.env
+.idea
+.vscode
+node_modules
+vendor
+public/css
+public/js
+storage/logs/*
