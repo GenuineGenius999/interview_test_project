@@ -20,28 +20,58 @@ The application intentionally has no public registration, password reset, API, q
 
 ## Initial setup
 
-Build the images and start MySQL first:
+Run these steps from the repository root.
+
+1. Start Docker Desktop, or start the Docker Engine on Linux. Wait until Docker reports that the engine is running. You can confirm it is available with:
+
+```bash
+docker info
+```
+
+2. Build the application images and start MySQL first:
 
 ```bash
 docker compose build
 docker compose up -d mysql
 ```
 
-Install locked PHP and JavaScript dependencies into their named volumes:
+3. Install locked PHP and JavaScript dependencies into their named volumes:
 
 ```bash
 docker compose run --rm php composer install --no-interaction --prefer-dist
 docker compose run --rm npm npm ci
 ```
 
-Start the full environment and initialize deterministic development data:
+4. Start the full environment:
 
 ```bash
 docker compose up -d
+```
+
+5. Initialize deterministic development data:
+
+```bash
 docker compose exec -T php sh -lc 'test "$APP_ENV" = local && test "$DB_DATABASE" = interview_test && php artisan migrate:fresh --seed --no-interaction'
 ```
 
-Open [http://localhost:8080](http://localhost:8080).
+6. Confirm MySQL and PHP show as healthy and Nginx is running:
+
+```bash
+docker compose ps
+```
+
+Open [http://localhost:8080](http://localhost:8080) and log in with one of the development accounts listed below.
+
+## Start after initial setup
+
+For normal daily use, start Docker Desktop or Docker Engine, open a terminal in the repository root, and run:
+
+```bash
+docker compose up -d
+docker compose ps
+```
+
+The named volumes preserve the database and installed dependencies between starts. You do not need to rerun Composer, npm, migrations, or seeds unless dependencies or database setup changed.
 
 ## Daily workflow
 
