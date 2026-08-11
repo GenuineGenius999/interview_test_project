@@ -54,7 +54,7 @@ services:
     npm:
         image: node:18-bullseye-slim
         working_dir: /var/www/html
-        command: sh -c "chown -R node:node /var/www/html/node_modules && su node -s /bin/sh -c 'npm install && npm run watch-poll'"
+        command: sh -c "chown -R node:node /var/www/html/node_modules && su node -s /bin/sh -c 'npm run watch-poll'"
         volumes:
             - ./:/var/www/html
             - npm_node_modules:/var/www/html/node_modules
@@ -74,6 +74,7 @@ services:
             - "${DB_FORWARD_PORT:-3307}:3306"
         volumes:
             - mysql_data:/var/lib/mysql
+            - ./.docker/mysql/init:/docker-entrypoint-initdb.d:ro
         networks:
             - interview_test
         healthcheck:

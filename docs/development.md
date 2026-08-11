@@ -2,30 +2,33 @@
 
 ## Services
 
-The Compose environment contains four services:
-
 | Service | Responsibility |
 | --- | --- |
 | `nginx` | Serves public assets and forwards PHP requests to PHP-FPM. |
-| `php` | Runs PHP-FPM, Composer, and Laravel Artisan commands. |
-| `npm` | Installs JavaScript dependencies and watches Vue 2 assets. |
-| `mysql` | Provides the MySQL 5.7.31 development database. |
+| `php` | Runs PHP-FPM, Composer, PHPUnit, and Laravel Artisan commands. |
+| `npm` | Watches and rebuilds front-end assets under Node 18. |
+| `mysql` | Provides MySQL 5.7.31 development and testing databases. |
 
-The database version follows the established `cme-customer-portal` development convention.
+The database version follows the established `cme-customer-portal` convention. MySQL remains on port `3306` inside the Docker network and is exposed on host port `3307` by default.
 
 ## Storage
 
-The source directory is bind-mounted into the application containers so code can be edited on the host. Stateful or generated dependencies are isolated in named Docker volumes:
+The host source directory is bind-mounted into the application containers. Generated or stateful dependencies use named volumes:
 
-- `mysql_data` stores database files.
-- `composer_vendor` stores PHP dependencies.
-- `npm_node_modules` stores JavaScript dependencies.
+- `mysql_data` stores both MySQL databases.
+- `composer_vendor` stores locked PHP dependencies.
+- `npm_node_modules` stores locked JavaScript dependencies.
 
-`docker compose down` preserves these volumes. Use `docker compose down --volumes` only when intentionally resetting the development environment.
+Normal setup, reset, start, and stop commands preserve these volumes. Dependency installation is explicit rather than running on every container restart.
 
-## Configuration
+## Databases
 
-Defaults are suitable for local development. Override them in a root `.env` file when needed:
+- `interview_test` contains local development data.
+- `interview_test_testing` is exclusively used by PHPUnit.
+
+The test bootstrap forces the testing database configuration before Laravel starts. The development reset command checks `APP_ENV=local` and `DB_DATABASE=interview_test` before running `migrate:fresh --seed`.
+
+## Configuration defaults
 
 | Variable | Default |
 | --- | --- |
@@ -38,20 +41,6 @@ Defaults are suitable for local development. Override them in a root `.env` file
 | `DOCKER_UID` | `1000` |
 | `DOCKER_GID` | `1000` |
 
-The committed credentials are development-only defaults. Do not reuse them in a deployed environment.
+These are local-development defaults and must not be reused for deployment.
 
-## Common commands
-
-```bash
-# Start or rebuild the environment
-docker compose up --build
-
-# Run the test suite
-docker compose exec php php artisan test
-
-# Run database migrations
-docker compose exec php php artisan migrate
-
-# Build front-end assets once
-docker compose run --rm npm npm run development
-```
+See the root [README](../README.md) for verified installation, reset, test, asset-build, and log commands.

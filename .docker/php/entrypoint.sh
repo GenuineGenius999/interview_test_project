@@ -13,6 +13,4 @@ mkdir -p \
 
 chown -R www-data:www-data bootstrap/cache storage
 
-composer install --no-interaction --prefer-dist
-
 exec "$@"

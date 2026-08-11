@@ -11,6 +11,7 @@ WORKDIR /var/www/html
 RUN apt-get update \
     && apt-get install --no-install-recommends -y git libzip-dev unzip \
     && docker-php-ext-install bcmath pdo_mysql zip \
+    && git config --system --add safe.directory /var/www/html \
     && groupmod --gid "${GID}" www-data \
     && usermod --uid "${UID}" --gid "${GID}" www-data \
     && apt-get clean \
